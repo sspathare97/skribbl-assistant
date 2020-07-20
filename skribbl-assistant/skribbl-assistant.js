@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Skribbl Assistant
-// @version      1.0.0
+// @version      1.1.0
 // @description  Fetches the Skribbl.io wordlist and displays clickable hints based on the current word's pattern.
 // @author       sspathare97
 // @match        https://skribbl.io/*
@@ -29,6 +29,7 @@
   const enabledText = 'Type to highlight hints. Press ALT to disable.';
 
   const hintClick = (event) => {
+    const inputChatVal = inputChat.value;
     inputChat.value = event.target.innerHTML;
     formChat.dispatchEvent(
       new Event('submit', {
@@ -36,12 +37,13 @@
         cancelable: true,
       })
     );
+    inputChat.value = inputChatVal;
     assist();
   };
 
   const assist = (event, wordChanged = false) => {
     const currentWordVal = currentWord.textContent;
-    let wordRegex = currentWordVal.replace(/_/g, '[^ -"]');
+    let wordRegex = currentWordVal.replace(/_/g, '[^ \\-"]');
     wordRegex = '"'.concat(wordRegex, '"');
     wordRegex = new RegExp(wordRegex, 'g');
 
@@ -59,8 +61,8 @@
       return a.toLowerCase().localeCompare(b.toLowerCase());
     });
 
-    if (window.Skribbl_Assistant_Debug && wordChanged) {
-      console.log({currentWordVal, hints});
+    if (localStorage.Skribbl_Assistant_Debug && wordChanged) {
+      console.log({currentWordVal, wordRegex, hints});
     }
 
     const inputChatVal = inputChat.value;
@@ -94,10 +96,12 @@
       return initialize();
     }
 
-    window.Skribbl_Assistant_Debug = false;
-
     wordList = JSON.stringify(wordList);
     wordList = wordList.substring(1, wordList.length - 1);
+
+    if (localStorage.Skribbl_Assistant_Debug) {
+      console.log({wordList});
+    }
 
     containerFreespace.style.display = 'none';
     assistantPanel = document.createElement('p');
