@@ -1,0 +1,13 @@
+{
+  "name": "Skribbl Assistant",
+  "version": "1.0.0",
+  "description": "Fetches the Skribbl.io wordlist and displays clickable hints based on the current word's pattern.",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["https://skribbl.io/*"],
+      "js": ["skribbl-assistant.js"]
+    }
+  ],
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+}
