@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Skribbl Assistant
-// @version      1.1.0
+// @version      1.2.0
 // @description  Fetches the Skribbl.io wordlist and displays clickable hints based on the current word's pattern.
 // @author       sspathare97
 // @match        https://skribbl.io/*
@@ -21,7 +21,6 @@
   const refreshDelay = 500;
   let wordList;
   let currentWordVal = '';
-  let enabled = false;
   let assistantPanel;
   let hintBox;
 
@@ -61,7 +60,7 @@
       return a.toLowerCase().localeCompare(b.toLowerCase());
     });
 
-    if (localStorage.Skribbl_Assistant_Debug && wordChanged) {
+    if (localStorage.getItem('Skribbl_Assistant_Debug') && wordChanged) {
       console.log({currentWordVal, wordRegex, hints});
     }
 
@@ -99,7 +98,7 @@
     wordList = JSON.stringify(wordList);
     wordList = wordList.substring(1, wordList.length - 1);
 
-    if (localStorage.Skribbl_Assistant_Debug) {
+    if (localStorage.getItem('Skribbl_Assistant_Debug')) {
       console.log({wordList});
     }
 
@@ -137,17 +136,24 @@
       containerSidebar.childNodes[0]
     );
 
-    inputChat.setAttribute('placeholder', disabledText);
+    if (localStorage.getItem('Skribbl_Assistant_Enabled')) {
+      assistantPanel.style.display = '';
+      inputChat.setAttribute('placeholder', enabledText);
+    } else {
+      assistantPanel.style.display = 'none';
+      inputChat.setAttribute('placeholder', disabledText);
+    }
 
     document.body.onkeyup = (event) => {
       if (event.key === 'Alt') {
-        enabled = !enabled;
-        if (enabled) {
-          assistantPanel.style.display = '';
-          inputChat.setAttribute('placeholder', enabledText);
-        } else {
+        if (localStorage.getItem('Skribbl_Assistant_Enabled')) {
+          localStorage.removeItem('Skribbl_Assistant_Enabled');
           assistantPanel.style.display = 'none';
           inputChat.setAttribute('placeholder', disabledText);
+        } else {
+          localStorage.setItem('Skribbl_Assistant_Enabled', 1);
+          assistantPanel.style.display = '';
+          inputChat.setAttribute('placeholder', enabledText);
         }
       }
     };
